@@ -39,15 +39,15 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.PropertySource;
 
 import javax.annotation.PostConstruct;
-
-
 
 
 @ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {WorkerServer.class})
 })
+@PropertySource(ignoreResourceNotFound = false, value = "classpath:master.properties")
 public class MasterServer {
 
     /**
@@ -62,8 +62,8 @@ public class MasterServer {
     private MasterConfig masterConfig;
 
     /**
-     *  spring application context
-     *  only use it for initialization
+     * spring application context
+     * only use it for initialization
      */
     @Autowired
     private SpringApplicationContext springApplicationContext;
@@ -93,8 +93,9 @@ public class MasterServer {
 
     /**
      * master server startup
-     *
+     * <p>
      * master server not use web service
+     *
      * @param args arguments
      */
     public static void main(String[] args) {
@@ -106,7 +107,7 @@ public class MasterServer {
      * run master server
      */
     @PostConstruct
-    public void run(){
+    public void run() {
 
         //init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
@@ -154,13 +155,14 @@ public class MasterServer {
 
     /**
      * gracefully close
+     *
      * @param cause close cause
      */
     public void close(String cause) {
 
         try {
             //execute only once
-            if(Stopper.isStopped()){
+            if (Stopper.isStopped()) {
                 return;
             }
 
@@ -172,7 +174,7 @@ public class MasterServer {
             try {
                 //thread sleep 3 seconds for thread quietly stop
                 Thread.sleep(3000L);
-            }catch (Exception e){
+            } catch (Exception e) {
                 logger.warn("thread sleep exception ", e);
             }
             //
@@ -181,11 +183,11 @@ public class MasterServer {
             this.masterRegistry.unRegistry();
             this.zkMasterClient.close();
             //close quartz
-            try{
+            try {
                 QuartzExecutors.getInstance().shutdown();
                 logger.info("Quartz service stopped");
-            }catch (Exception e){
-                logger.warn("Quartz service stopped exception:{}",e.getMessage());
+            } catch (Exception e) {
+                logger.warn("Quartz service stopped exception:{}", e.getMessage());
             }
         } catch (Exception e) {
             logger.error("master server stop exception ", e);

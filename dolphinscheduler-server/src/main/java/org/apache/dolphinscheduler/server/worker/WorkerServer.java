@@ -32,13 +32,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.PropertySource;
 
 import javax.annotation.PostConstruct;
 
 /**
- *  worker server
+ * worker server
  */
 @ComponentScan("org.apache.dolphinscheduler")
+@PropertySource(ignoreResourceNotFound = false, value = "classpath:worker.properties")
 public class WorkerServer {
 
     /**
@@ -47,33 +49,34 @@ public class WorkerServer {
     private static final Logger logger = LoggerFactory.getLogger(WorkerServer.class);
 
     /**
-     *  netty remote server
+     * netty remote server
      */
     private NettyRemotingServer nettyRemotingServer;
 
     /**
-     *  worker registry
+     * worker registry
      */
     @Autowired
     private WorkerRegistry workerRegistry;
 
     /**
-     *  worker config
+     * worker config
      */
     @Autowired
     private WorkerConfig workerConfig;
 
     /**
-     *  spring application context
-     *  only use it for initialization
+     * spring application context
+     * only use it for initialization
      */
     @Autowired
     private SpringApplicationContext springApplicationContext;
 
     /**
      * worker server startup
-     *
+     * <p>
      * worker server not use web service
+     *
      * @param args arguments
      */
     public static void main(String[] args) {
@@ -86,7 +89,7 @@ public class WorkerServer {
      * worker server run
      */
     @PostConstruct
-    public void run(){
+    public void run() {
         logger.info("start worker server...");
 
         //init remoting server
@@ -115,7 +118,7 @@ public class WorkerServer {
 
         try {
             //execute only once
-            if(Stopper.isStopped()){
+            if (Stopper.isStopped()) {
                 return;
             }
 
@@ -127,7 +130,7 @@ public class WorkerServer {
             try {
                 //thread sleep 3 seconds for thread quitely stop
                 Thread.sleep(3000L);
-            }catch (Exception e){
+            } catch (Exception e) {
                 logger.warn("thread sleep exception", e);
             }
 
